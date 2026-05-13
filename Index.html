@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Daily Planner</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-dark: #1a1a1a;
+            --lamp-on: #fff7cc;
+            --accent-cat: #ff9f43;
+            --accent-love: #ff4d4d;
+            --accent-wish: #48dbfb;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background 0.5s ease;
+            overflow-x: hidden;
+        }
+
+        body.light-on {
+            background-color: #f0f0f0;
+        }
+
+        /* --- Animasi Lampu --- */
+        .lamp-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .lamp-head {
+            width: 120px;
+            height: 80px;
+            background: #444;
+            border-radius: 50px 50px 0 0;
+            position: relative;
+            z-index: 2;
+            margin-top: -10px;
+        }
+
+        .light-beam {
+            position: absolute;
+            top: 70px;
+            width: 200px;
+            height: 250px;
+            background: radial-gradient(circle, var(--lamp-on) 0%, transparent 70%);
+            clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .pull-cord {
+            position: absolute;
+            top: 70px;
+            right: calc(50% - 40px);
+            width: 4px;
+            height: 150px;
+            background: #333;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .pull-handle {
+            position: absolute;
+            bottom: -15px;
+            left: -8px;
+            width: 20px;
+            height: 20px;
+            background: #888;
+            border-radius: 50%;
+        }
+
+        .light-on .light-beam { opacity: 0.8; }
+        .light-on .lamp-head { background: #666; box-shadow: 0 0 20px var(--lamp-on); }
+
+        /* --- Panel Tabel --- */
+        .card-container {
+            display: none;
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 50px;
+            animation: slideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        h2 { text-align: center; margin-bottom: 20px; color: #333; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+        }
+
+        .icon-cell { width: 40px; }
+
+        /* --- Dekorasi Spesifik --- */
+        .cat-paw { position: absolute; top: 10px; right: 10px; opacity: 0.2; color: var(--accent-cat); }
+        .love-icon { position: absolute; top: 10px; right: 10px; opacity: 0.2; color: var(--accent-love); }
+
+        .btn-next {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #333;
+            color: white;
+            text-align: center;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .btn-next:hover { transform: scale(1.02); }
+
+        /* --- Kolom 3: Wish & Alarm --- */
+        .wish-text {
+            font-size: 1.2rem;
+            text-align: center;
+            font-style: italic;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        .alarm-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 10px;
+            background: #f1f2f6;
+            border-radius: 50px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="lamp-container">
+        <div class="lamp-head"></div>
+        <div class="light-beam"></div>
+        <div class="pull-cord" id="cord" onclick="toggleLight()">
+            <div class="pull-handle"></div>
+        </div>
+    </div>
+
+    <!-- Kolom 1: Kucing -->
+    <div id="card1" class="card-container">
+        <div class="cat-paw"><i data-lucide="paw-print" size="48"></i></div>
+        <h2>Jadwal Makan Kucing 🐾</h2>
+        <table>
+            <tr><td class="icon-cell"><i data-lucide="sunrise"></i></td><td>Pagi Hari</td><td><b>08:00</b></td></tr>
+            <tr><td class="icon-cell"><i data-lucide="sun"></i></td><td>Siang Hari</td><td><b>12:00</b></td></tr>
+            <tr><td class="icon-cell"><i data-lucide="moon"></i></td><td>Malam Hari</td><td><b>16:00</b></td></tr>
+        </table>
+        <button class="btn-next" onclick="showNext(2)">Next</button>
+    </div>
+
+    <!-- Kolom 2: Rutinitas -->
+    <div id="card2" class="card-container">
+        <div class="love-icon"><i data-lucide="heart" size="48"></i></div>
+        <h2>Rutinitas Harian ❤️</h2>
+        <table>
+            <tr><td class="icon-cell"><i data-lucide="alarm-clock"></i></td><td>Bangun Tidur</td><td><b>06:00</b></td></tr>
+            <tr><td class="icon-cell"><i data-lucide="coffee"></i></td><td>Sarapan</td><td><b>07:30</b></td></tr>
+            <tr><td class="icon-cell"><i data-lucide="bath"></i></td><td>Mandi Sore</td><td><b>17:00</b></td></tr>
+        </table>
+        <button class="btn-next" onclick="showNext(3)">Next</button>
+    </div>
+
+    <!-- Kolom 3: Wish -->
+    <div id="card3" class="card-container">
+        <h2>Daily Wish ✨</h2>
+        <div class="wish-text">
+            "Hope you have a great day and happiness coming to you"
+        </div>
+        <div class="alarm-box">
+            <i data-lucide="bell-ring" style="color: #e67e22;"></i>
+            <span>Alarm: Stay Positive!</span>
+        </div>
+    </div>
+
+    <script>
+        // Inisialisasi ikon
+        lucide.createIcons();
+
+        function toggleLight() {
+            const body = document.body;
+            const cord = document.getElementById('cord');
+            const card1 = document.getElementById('card1');
+            
+            // Animasi tarik tali
+            cord.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                cord.style.transform = 'translateY(0px)';
+            }, 100);
+
+            body.classList.toggle('light-on');
+
+            // Munculkan kolom pertama jika lampu menyala
+            if(body.classList.contains('light-on')) {
+                card1.style.display = 'block';
+            } else {
+                // Sembunyikan semua jika lampu dimatikan
+                document.querySelectorAll('.card-container').forEach(c => c.style.display = 'none');
+            }
+        }
+
+        function showNext(cardNumber) {
+            // Sembunyikan kartu saat ini
+            document.querySelectorAll('.card-container').forEach(c => c.style.display = 'none');
+            
+            // Tampilkan kartu berikutnya
+            const nextCard = document.getElementById('card' + cardNumber);
+            if(nextCard) {
+                nextCard.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
